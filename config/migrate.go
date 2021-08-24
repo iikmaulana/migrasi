@@ -6,6 +6,7 @@ import (
 	"github.com/iikmaulana/migrasi/models"
 	"github.com/opentracing/opentracing-go/log"
 	r "gopkg.in/rethinkdb/rethinkdb-go.v6"
+	"os"
 )
 
 func (cfg *Config) InitMigrate() serror.SError {
@@ -39,7 +40,7 @@ func (cfg *Config) InitMigrate() serror.SError {
 			log.Error(serror.NewFromErrorc(err, fmt.Sprintf("Error Scan %s", data.DriverID)))
 		}
 
-		_, err = r.Table("mt_driver").Insert(map[string]interface{}{
+		_, err = r.Table(os.Getenv("RETHINKDB_TABLE")).Insert(map[string]interface{}{
 			"address":        "",
 			"app_id":         "480cea73-3263-4111-bb7e-749b2c6493b3",
 			"code":           data.DriverCode,
