@@ -39,6 +39,6 @@ func Init() Config {
 		errx.Panic()
 	}
 
-	fmt.Println("Server is running ..")
+	fmt.Println("Done")
 	return cfg
 }
