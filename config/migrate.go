@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"github.com/iikmaulana/gateway/libs/helper"
 	"github.com/iikmaulana/gateway/libs/helper/serror"
 	"github.com/iikmaulana/migrasi/models"
 	"github.com/opentracing/opentracing-go/log"
@@ -39,6 +40,8 @@ func (cfg *Config) InitMigrate() serror.SError {
 		if err != nil {
 			log.Error(serror.NewFromErrorc(err, fmt.Sprintf("Error Scan %s", data.DriverID)))
 		}
+
+		fmt.Println(fmt.Sprintf("Insert data %s rethinkdb", helper.Int64ToString(data.DriverID)))
 
 		_, err = r.Table(os.Getenv("RETHINKDB_TABLE")).Insert(map[string]interface{}{
 			"address":        "",
