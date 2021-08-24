@@ -13,14 +13,15 @@ import (
 func (cfg *Config) InitMigrate() serror.SError {
 
 	rethinkTable := os.Getenv("RETHINKDB_TABLE")
+	cockroarchDb := os.Getenv("DB_NAME")
 
-	query := `select coalesce(dv.driver_id::text, '')  as driver_id,
+	query := fmt.Sprintf(`select coalesce(dv.driver_id::text, '')  as driver_id,
 					   coalesce(dv.driver_name::text, '')  as driver_name,
 					   coalesce(dv.driver_code::text, '')  as driver_code,
 					   coalesce(dv.number_sim::text, '')   as number_sim,
 					   coalesce(dv.phone_number::text, '') as phone_number,
 					   coalesce(dv.member_id::text, '')    as member_id
-				from dev_runner_app.public.mt_driver dv`
+				from %s.public.mt_driver dv`, cockroarchDb)
 
 	rows, err := cfg.DB.Queryx(query)
 	if err != nil {
