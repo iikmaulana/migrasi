@@ -12,6 +12,8 @@ import (
 
 func (cfg *Config) InitMigrate() serror.SError {
 
+	rethinkTable := os.Getenv("RETHINKDB_TABLE")
+
 	query := `select coalesce(dv.driver_id::text, '')  as driver_id,
 					   coalesce(dv.driver_name::text, '')  as driver_name,
 					   coalesce(dv.driver_code::text, '')  as driver_code,
@@ -43,7 +45,7 @@ func (cfg *Config) InitMigrate() serror.SError {
 
 		fmt.Println(fmt.Sprintf("Insert data %s rethinkdb", helper.Int64ToString(data.DriverID)))
 
-		_, err = r.Table(os.Getenv("RETHINKDB_TABLE")).Insert(map[string]interface{}{
+		_, err = r.Table(rethinkTable).Insert(map[string]interface{}{
 			"address":        "",
 			"app_id":         "480cea73-3263-4111-bb7e-749b2c6493b3",
 			"code":           data.DriverCode,
