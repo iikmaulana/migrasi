@@ -35,9 +35,9 @@ func (cfg *Config) InitMigrate() serror.SError {
 			log.Error(serror.NewFromErrorc(err, fmt.Sprintf("Error StructScan %s", data)))
 		}
 
-		query := `select coalesce(mv.imei::text, '') as imei 
-						from dev_runner_app.public.mt_vehicle mv 
-				  where mv.driver_id = $1`
+		query := fmt.Sprintf(`select coalesce(mv.imei::text, '') as imei 
+						from %s.public.mt_vehicle mv 
+				  where mv.driver_id = $1`, cockroarchDb)
 
 		err := cfg.DB.QueryRowx(query, data.DriverID).Scan(&data.Imei)
 		if err != nil {
