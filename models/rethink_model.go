@@ -3,6 +3,7 @@ package models
 import "time"
 
 type RethinkModel struct {
+	Id            string    `json:"id"`
 	Address       string    `json:"address"`
 	AppID         string    `json:"app_id"`
 	Code          string    `json:"code"`

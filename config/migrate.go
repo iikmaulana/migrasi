@@ -1,8 +1,8 @@
 package config
 
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/iikmaulana/gateway/libs/helper"
 	"github.com/iikmaulana/gateway/libs/helper/serror"
 	"github.com/iikmaulana/migrasi/models"
 	"github.com/opentracing/opentracing-go/log"
@@ -44,24 +44,59 @@ func (cfg *Config) InitMigrate() serror.SError {
 			log.Error(serror.NewFromErrorc(err, fmt.Sprintf("Error Scan %s", data.DriverID)))
 		}
 
-		fmt.Println(fmt.Sprintf("Insert data %s rethinkdb", helper.Int64ToString(data.DriverID)))
+		fmt.Println(fmt.Sprintf("Replace vehicle_id %s and name %s rethinkdb", data.Imei, data.DriverName))
 
-		_, err = r.Table(rethinkTable).Insert(map[string]interface{}{
-			"address":        "",
-			"app_id":         "480cea73-3263-4111-bb7e-749b2c6493b3",
-			"code":           data.DriverCode,
-			"created_at":     r.Now(),
-			"driving_status": "-",
-			"job_status":     "standby",
-			"name":           data.DriverName,
-			"owner_id":       data.MemberID,
-			"phone":          data.PhoneNumber,
-			"photo":          "",
-			"sim_expired":    "",
-			"sim_number":     data.NumberSim,
-			"user_id":        "",
-			"vehicle_id":     data.Imei,
+		result, err := r.Table(rethinkTable).Filter(map[string]interface{}{
+			"vehicle_id": data.Imei,
+			"name":       data.DriverName,
 		}).Run(cfg.DBRething)
+
+		res, err := result.Interface()
+		rethingModel := []models.RethinkModel{}
+		bodyBytes, _ := json.Marshal(res)
+		err = json.Unmarshal(bodyBytes, &rethingModel)
+		if err != nil {
+			log.Error(serror.NewFromErrorc(err, fmt.Sprintf("Error Unmarshal %s", data.DriverID)))
+		}
+
+		if len(rethingModel) > 0 {
+			_, err = r.Table(rethinkTable).Get(rethingModel[0].Id).Replace(map[string]interface{}{
+				"id":               rethingModel[0].Id,
+				"address":          "",
+				"app_id":           "480cea73-3263-4111-bb7e-749b2c6493b3",
+				"code":             data.DriverCode,
+				"created_at":       r.Now(),
+				"driving_status":   "-",
+				"job_status":       "standby",
+				"name":             data.DriverName,
+				"owner_id":         data.MemberID,
+				"phone":            data.PhoneNumber,
+				"photo":            "",
+				"sim_expired":      "",
+				"sim_number":       data.NumberSim,
+				"user_id":          "",
+				"vehicle_id":       data.Imei,
+				"runner_driver_id": data.DriverID,
+			}).RunWrite(cfg.DBRething)
+		} else {
+			_, err = r.Table(rethinkTable).Insert(map[string]interface{}{
+				"address":          "",
+				"app_id":           "480cea73-3263-4111-bb7e-749b2c6493b3",
+				"code":             data.DriverCode,
+				"created_at":       r.Now(),
+				"driving_status":   "-",
+				"job_status":       "standby",
+				"name":             data.DriverName,
+				"owner_id":         data.MemberID,
+				"phone":            data.PhoneNumber,
+				"photo":            "",
+				"sim_expired":      "",
+				"sim_number":       data.NumberSim,
+				"user_id":          "",
+				"vehicle_id":       data.Imei,
+				"runner_driver_id": data.DriverID,
+			}).Run(cfg.DBRething)
+		}
 
 		if err != nil {
 			log.Error(serror.NewFromErrorc(err, fmt.Sprintf("Error Input %s", data.DriverID)))

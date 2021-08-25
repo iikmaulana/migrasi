@@ -1,7 +1,7 @@
 package models
 
 type CockroachModel struct {
-	DriverID    int64  `db:"driver_id" json:"driver_id"`
+	DriverID    string `db:"driver_id" json:"driver_id"`
 	DriverName  string `db:"driver_name" json:"driver_name"`
 	DriverCode  string `db:"driver_code" json:"driver_code"`
 	NumberSim   string `db:"number_sim" json:"number_sim"`
